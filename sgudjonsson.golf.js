@@ -1,7 +1,7 @@
 
 var sgudjonsson = sgudjonsson || {};
 
-var sgudjonsson.golf = (function() {
+sgudjonsson.golf = (function() {
 
 	var _methods = {
 		_getAdjustedPar: function(playerCourseHandicap, holeHandicap, holePar) {
