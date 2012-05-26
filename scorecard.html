@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<script src="jquery.min.js" type="text/javascript"></script>
+		<script src="jquery.tmpl.min.js" type="text/javascript"></script>
+		<script src="sgudjonsson.golf.js" type="text/javascript"></script>
+
+		<style type="text/css">
+
+			* {
+				font-family: Calibri, Arial;
+				font-size: 14px;
+			}
+
+			table {
+				border-top: solid 1px #e6e6e6;
+				border-left: solid 1px #e6e6e6;
+			}
+
+			table th, table td {
+				padding: 3px;
+				border-right: solid 1px #e6e6e6;
+				border-bottom: solid 1px #e6e6e6;
+				text-align: center;
+			}
+
+			th {
+				background-color: #f5f5f5;
+			}
+
+			td.good {
+				background-color: rgb(168,225,81);
+			}
+
+			#adjusted-par-row td {
+				background-color: rgb(121,211,255);
+			}
+
+			input.stroke {
+				text-align: center;
+			}
+
+		</style>
+
+	</head>
+	<body>
+		<div>
+			<label for="courses">Courses</label>
+			<select id="courses">
+				<option value="">- Select a course -</option>
+			</select>
+			<label for="course-handicap">Course Hdcp</label>
+			<input id="course-handicap" value="36" />
+			<button id="show-scorecard">Show scorecard</button>
+		</div>
+		<div id="scorecard">
+		</div>
+
+		<script type="text/html" id="template-table">
+			<table id="scorecard-table" cellspacing="0">
+				<thead>
+					<tr>
+						<th>Hole</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</script>
+
+		<script type="text/html" id="template-table-hole-cell">
+			<th>${nr}</th>
+		</script>
+
+		<script type="text/html" id="template-table-hole-hdcp-row">
+			<tr id="hdcp-row">
+				<th>Hdcp</th>
+			</tr>
+		</script>
+
+		<script type="text/html" id="template-table-hole-par-row">
+			<tr id="par-row">
+				<th>Par</th>
+			</tr>
+		</script>
+
+		<script type="text/html" id="template-table-hole-adjustedpar-row">
+			<tr id="adjusted-par-row">
+				<th>Adjusted Par</th>
+			</tr>
+		</script>
+
+		<script type="text/html" id="template-table-hole-strokes-row">
+			<tr id="strokes-row">
+				<th>Strokes</th>
+			</tr>
+		</script>
+
+		<script type="text/html" id="template-table-hole-points-row">
+			<tr id="points-row">
+				<th>Points</th>
+			</tr>
+		</script>
+
+		<script type="text/html" id="template-table-cell">
+			<td>${content}</td>
+		</script>
+
+		<script type="text/html" id="template-table-stroke-cell">
+			<td><input type="text" maxlength="2" size="2" class="stroke" /></td>
+		</script>
+
+		<script type="text/javascript">
+
+			var courses = [
+				{
+					id: "GHR",
+					title: "GHR Strandarvöllur",
+					holes: [
+						{ nr:  1, par: 4, hdcp:  8 },
+						{ nr:  2, par: 3, hdcp: 16 },
+						{ nr:  3, par: 5, hdcp:  2 },
+						{ nr:  4, par: 3, hdcp: 10 },
+						{ nr:  5, par: 5, hdcp:  4 },
+						{ nr:  6, par: 4, hdcp: 14 },
+						{ nr:  7, par: 4, hdcp: 18 },
+						{ nr:  8, par: 3, hdcp: 12 },
+						{ nr:  9, par: 4, hdcp:  6 },
+						{ nr: 10, par: 4, hdcp: 11 },
+						{ nr: 11, par: 3, hdcp: 17 },
+						{ nr: 12, par: 4, hdcp:  3 },
+						{ nr: 13, par: 3, hdcp:  7 },
+						{ nr: 14, par: 4, hdcp:  1 },
+						{ nr: 15, par: 5, hdcp:  5 },
+						{ nr: 16, par: 4, hdcp: 13 },
+						{ nr: 17, par: 4, hdcp: 15 },
+						{ nr: 18, par: 4, hdcp:  9 },
+					]
+				}
+			];
+
+			$(function() {
+
+				$(courses).each(function(i, course) {
+					$("#courses").append("<option value=\""+ course.id +"\">"+ course.title +"</option>");
+				});
+
+				$("#show-scorecard").click(function(evt) {
+					evt.preventDefault();
+
+					var courseId = $("#courses").val();
+					var course = null;
+					if(courseId != "") {
+						for(var i = 0; i < courses.length; i++) {
+							if(courses[i].id == courseId) {
+								course = courses[i];
+								break;
+							}
+						}
+
+						var courseHdcp = parseInt($("#course-handicap").val());
+
+						$("#scorecard")
+							.empty()
+							.append($("#template-table").tmpl({}));
+
+						$("#scorecard-table tbody")
+							.append($("#template-table-hole-hdcp-row").tmpl({}))
+							.append($("#template-table-hole-par-row").tmpl({}))
+							.append($("#template-table-hole-adjustedpar-row").tmpl({}))
+							.append($("#template-table-hole-strokes-row").tmpl({}))
+							.append($("#template-table-hole-points-row").tmpl({}));
+
+						for(var i = 0; i < course.holes.length; i++) {
+							$("#scorecard-table thead tr")
+								.append($("#template-table-hole-cell").tmpl(course.holes[i]));
+							$("#scorecard-table #hdcp-row")
+								.append($("#template-table-cell").tmpl({ content: course.holes[i].hdcp }));
+							$("#scorecard-table #par-row")
+								.append($("#template-table-cell").tmpl({ content: course.holes[i].par }));
+
+							var adjustedPar = sgudjonsson.golf.getAdjustedPar(courseHdcp, course.holes[i].hdcp, course.holes[i].par);
+
+							$("#scorecard-table #adjusted-par-row")
+								.append($("#template-table-cell").tmpl({ content: adjustedPar }));
+
+							$("#scorecard-table #strokes-row")
+								.append($("#template-table-stroke-cell").tmpl({}));
+
+							$("#scorecard-table #strokes-row td input").last()
+								.data(course.holes[i])
+								.blur(function() {
+									var d = $(this).data();
+									var s = parseInt($(this).val());
+									var h = parseInt($("#course-handicap").val());
+									var a = sgudjonsson.golf.getAdjustedPar(h, d.hdcp, d.par);
+									var p = sgudjonsson.golf.getStablefordPoints(a, s);
+									$(".points-"+ d.nr).text(p);
+
+									if(p > 0) {
+										$(".points-"+ d.nr).addClass("good");
+									} else {
+										$(".points-"+ d.nr).removeClass("good");
+									}
+								})
+
+							$("#scorecard-table #points-row")
+								.append($("#template-table-cell").tmpl({ content: "&nbsp;" }));
+
+							$("#scorecard-table #points-row td").last()
+								.addClass("points-"+ course.holes[i].nr);
+						}
+					}
+
+					$("#scorecard-table #strokes-row td input")
+						.first()
+						.focus();
+				});
+
+
+				$("#courses").val("GHR");
+				$("#course-handicap").val("27");
+				$("#show-scorecard").click();
+			});
+
+		</script>
+	</body>
+</html>
