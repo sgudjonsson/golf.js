@@ -140,6 +140,9 @@
 				}
 			];
 
+			var scorecard = [];
+			var totalAdjustedPar = 0;
+
 			$(function() {
 
 				$(courses).each(function(i, course) {
@@ -152,6 +155,9 @@
 					var courseId = $("#courses").val();
 					var course = null;
 					if(courseId != "") {
+
+						totalAdjustedPar = 0;
+
 						for(var i = 0; i < courses.length; i++) {
 							if(courses[i].id == courseId) {
 								course = courses[i];
@@ -172,7 +178,10 @@
 							.append($("#template-table-hole-strokes-row").tmpl({}))
 							.append($("#template-table-hole-points-row").tmpl({}));
 
+						var totalPar = 0;
 						for(var i = 0; i < course.holes.length; i++) {
+							totalPar += course.holes[i].par;
+
 							$("#scorecard-table thead tr")
 								.append($("#template-table-hole-cell").tmpl(course.holes[i]));
 							$("#scorecard-table #hdcp-row")
@@ -181,6 +190,8 @@
 								.append($("#template-table-cell").tmpl({ content: course.holes[i].par }));
 
 							var adjustedPar = sgudjonsson.golf.getAdjustedPar(courseHdcp, course.holes[i].hdcp, course.holes[i].par);
+
+							totalAdjustedPar += adjustedPar;
 
 							$("#scorecard-table #adjusted-par-row")
 								.append($("#template-table-cell").tmpl({ content: adjustedPar }));
@@ -211,6 +222,33 @@
 							$("#scorecard-table #points-row td").last()
 								.addClass("points-"+ course.holes[i].nr);
 						}
+
+						$("#scorecard-table thead tr")
+							.append("<th>Total</th>");
+
+						$("#scorecard-table #hdcp-row")
+							.append($("#template-table-cell").tmpl({ content: "-" }));
+
+						$("#scorecard-table #par-row")
+							.append($("#template-table-cell").tmpl({ content: totalPar }));
+
+						$("#scorecard-table #adjusted-par-row")
+							.append($("#template-table-cell").tmpl({ content: totalAdjustedPar }))
+							.find("td")
+							.last()
+							.addClass("adjusted-par-total");
+
+						$("#scorecard-table #strokes-row")
+							.append($("#template-table-cell").tmpl({ content: "&nbsp;" }))
+							.find("td")
+							.last()
+							.addClass("strokes-total");
+							
+						$("#scorecard-table #points-row")
+							.append($("#template-table-cell").tmpl({ content: "&nbsp;" }))
+							.find("td")
+							.last()
+							.addClass("points-total");
 					}
 
 					$("#scorecard-table #strokes-row td input")
