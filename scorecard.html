@@ -29,8 +29,12 @@
 				background-color: #f5f5f5;
 			}
 
-			td.good {
+			td.green {
 				background-color: rgb(168,225,81);
+			}
+
+			td.yellow {
+				background-color: #DBE151;
 			}
 
 			#adjusted-par-row td {
@@ -140,8 +144,27 @@
 				}
 			];
 
-			var scorecard = [];
+			var totalPoints = [];
+			var totalStrokes = [];
 			var totalAdjustedPar = 0;
+
+			var updateTotalPoints = function() {
+				var sum = 0;
+				for(var i = 0; i < totalPoints.length; i++) {
+					if(!isNaN(totalPoints[i]))
+						sum += totalPoints[i];
+				}
+				$(".points-total").text(sum);
+			};
+
+			var updateTotalStrokes = function() {
+				var sum = 0;
+				for(var i = 0; i < totalStrokes.length; i++) {
+					if(!isNaN(totalStrokes[i]))
+						sum += totalStrokes[i];
+				}
+				$(".strokes-total").text(sum);
+			};
 
 			$(function() {
 
@@ -202,18 +225,26 @@
 							$("#scorecard-table #strokes-row td input").last()
 								.data(course.holes[i])
 								.blur(function() {
-									var d = $(this).data();
-									var s = parseInt($(this).val());
-									var h = parseInt($("#course-handicap").val());
-									var a = sgudjonsson.golf.getAdjustedPar(h, d.hdcp, d.par);
-									var p = sgudjonsson.golf.getStablefordPoints(a, s);
+									var d = $(this).data(),
+										s = parseInt($(this).val()),
+										h = parseInt($("#course-handicap").val()),
+										a = sgudjonsson.golf.getAdjustedPar(h, d.hdcp, d.par),
+										p = sgudjonsson.golf.getStablefordPoints(a, s);
+
 									$(".points-"+ d.nr).text(p);
 
-									if(p > 0) {
-										$(".points-"+ d.nr).addClass("good");
-									} else {
-										$(".points-"+ d.nr).removeClass("good");
-									}
+									totalStrokes[d.nr-1] = s;
+									totalPoints[d.nr-1] = p;
+
+									$(".points-"+ d.nr).removeClass("green yellow");
+
+									if(p > 1)
+										$(".points-"+ d.nr).addClass("green");
+									else if(p > 0)
+										$(".points-"+ d.nr).addClass("yellow");
+
+									updateTotalStrokes();
+									updateTotalPoints();
 								})
 
 							$("#scorecard-table #points-row")
