@@ -12,6 +12,9 @@ sgudjonsson.golf = (function() {
 				if(playerCourseHandicap - 18 >= holeHandicap)
 					results++;
 
+				if((playerCourseHandicap > 0 && playerCourseHandicap < 18) && playerCourseHandicap > holeHandicap)
+					results++;
+
 				return results;
 			},
 		_getStablefordPoints: function(adjustedPar, strokes) {
