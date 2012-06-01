@@ -19,7 +19,7 @@ sgudjonsson.golf = (function() {
 			},
 		_getStablefordPoints: function(adjustedPar, strokes) {
 			var stablefordPoints = 0;
-			if(!isNaN(strokes)) {
+			if(!isNaN(strokes) && strokes > 0) {
 				var strokesOverAdjustedPar = strokes - adjustedPar;
 
 				if(strokesOverAdjustedPar == 1)
