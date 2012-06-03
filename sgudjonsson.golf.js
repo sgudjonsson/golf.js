@@ -39,78 +39,61 @@ sgudjonsson.golf = (function() {
 		},
 		_getNewHandicap: function(playerCurrentHandicap, stablefordPoints, is18) {
 
+			// hdcp calculation categories
 			var categories = [
-				{
-					Category: 1,
-					HcpMax: 4.4,
-					Inc: 0.1,
-					Dec: 0.1,
-					BufferFrom18: 35,
-					Buffer9: undefined,
-				},
-				{
-					Category: 2,
-					HcpMax: 11.4,
-					Inc: 0.1,
-					Dec: 0.2,
-					BufferFrom18: 34,
-					Buffer9: undefined,
-				},
-				{
-					Category: 3,
-					HcpMax: 18.4,
-					Inc: 0.1,
-					Dec: 0.3,
-					BufferFrom18: 33,
-					Buffer9: 35,
-				},
-				{
-					Category: 4,
-					HcpMax: 26.4,
-					Inc: 0.1,
-					Dec: 0.4,
-					BufferFrom18: 32,
-					Buffer9: 34,
-				},
-				{
-					Category: 5,
-					HcpMax: 36,
-					Inc: 0.2,
-					Dec: 0.5,
-					BufferFrom18: 31,
-					Buffer9: 33,
-				}
+				{ Category: 1, HcpMax:  4.4, Inc: 0.1, Dec: 0.1, BufferFrom18: 35, Buffer9: undefined },
+				{ Category: 2, HcpMax: 11.4, Inc: 0.1, Dec: 0.2, BufferFrom18: 34, Buffer9: undefined },
+				{ Category: 3, HcpMax: 18.4, Inc: 0.1, Dec: 0.3, BufferFrom18: 33, Buffer9: 35 },
+				{ Category: 4, HcpMax: 26.4, Inc: 0.1, Dec: 0.4, BufferFrom18: 32, Buffer9: 34 },
+				{ Category: 5, HcpMax: 36.0, Inc: 0.2, Dec: 0.5, BufferFrom18: 31, Buffer9: 33 }
 			];
 
-			var playerCategory = categories[categories.length - 1];
-			for(var i = categories.length - 1; i >= 0; i--)
-				if(categories[i].HcpMax >= playerCurrentHandicap)
-					playerCategory = categories[i];
+			// returns the current category for a current hdcp
+			var getPlayerCategory = function() {
+				var playerCategory = categories[categories.length - 1];
+				for(var i = categories.length - 1; i >= 0; i--)
+					if(categories[i].HcpMax >= playerCurrentHandicap)
+						playerCategory = categories[i];
+				return playerCategory;
+			};
 
-			var buffer = is18 ? playerCategory.BufferFrom18 : playerCategory.Buffer9;
+			// util function that fixes the return float value
+			var fixFloat = function(hdcp) {
+				return parseFloat(parseFloat(hdcp).toFixed(1));
+			};
+
+			// start by getting the current hdcp category
+			var playerCategory = getPlayerCategory();
+
+			// if 9 holes where played, then add 18 points to the current points
 			if(!is18)
 				stablefordPoints += 18;
 
+			// get the buffer, depending on 9 or 18 holes played
+			var buffer = is18 ? playerCategory.BufferFrom18 : playerCategory.Buffer9;
+
+			// only for buffer 18 from cat 1 - 5 and buffer 9 cat 3 - 5
 			if(buffer != undefined) {
+
+				// if points are between buffer and 36 (inclusive) then the hdcp should remain the same
 				if(stablefordPoints >= buffer && stablefordPoints <= 36)
-					return parseFloat(parseFloat(playerCurrentHandicap).toFixed(1));
+					return fixFloat(playerCurrentHandicap);
+
+				// if points are less than the given buffer then the hdcp should increase
 				if(stablefordPoints < buffer)
-					return parseFloat(parseFloat(playerCurrentHandicap + playerCategory.Inc).toFixed(1));
+					return fixFloat(playerCurrentHandicap + playerCategory.Inc);
 			}
 
-			for(var i = 0; i < Math.abs(stablefordPoints - 36); i++) {
+			// 9 holes don't qualify for cat 1 - 2 hdcp (buffer == undefined)
+			if(buffer == undefined && !is18)
+				return fixFloat(playerCurrentHandicap);
 
-				// get the current category
-				var playerCategory = categories[categories.length - 1];
-				for(var c = categories.length - 1; c >= 0; c--)
-					if(categories[c].HcpMax >= playerCurrentHandicap)
-						playerCategory = categories[c];
-
-
-				playerCurrentHandicap -= playerCategory.Dec;
+			// for all points above 36, decrease the hdcp by the correct category decrease amount
+			for(var i = 0; i < (stablefordPoints - 36); i++) {
+				playerCurrentHandicap -= getPlayerCategory().Dec;
 			}
 
-			return parseFloat(parseFloat(playerCurrentHandicap).toFixed(1));
+			return fixFloat(playerCurrentHandicap);
 		}
 	};
 
