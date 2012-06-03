@@ -55,7 +55,11 @@
 				<option value="">- Select a course -</option>
 			</select>
 			<label for="course-handicap">Course Hdcp</label>
-			<input id="course-handicap" value="36" />
+			<input id="course-handicap" value="36" maxlength="2" size="2" />
+			<label for="exact-handicap">Exact handicap</label>
+			<input id="exact-handicap" value="36" maxlength="2" size="2" />
+			<label for="new-exact-handicap">New Exact handicap</label>
+			<input id="new-exact-handicap" value="36" maxlength="2" size="2" />
 			<button id="show-scorecard">Show scorecard</button>
 		</div>
 		<div id="scorecard">
@@ -166,6 +170,26 @@
 				$(".strokes-total").text(sum);
 			};
 
+			var updateNewHandicap = function() {
+				var sum = 0;
+				var count = 0;
+				for(var i = 0; i < totalPoints.length; i++) {
+					if(!isNaN(totalPoints[i])) {
+						sum += totalPoints[i];
+						count++;
+					}
+				}
+
+				var hdcp = $("#exact-handicap").val();
+				if(count == 9)
+					hdcp = sgudjonsson.golf.getNewHandicap(parseInt(hdcp), sum, false);
+				else if(count == 18)
+					hdcp = sgudjonsson.golf.getNewHandicap(parseInt(hdcp), sum, true);
+
+				if(count == 9 || count == 18)
+					$("#new-exact-handicap").val(hdcp);
+			};
+
 			$(function() {
 
 				$(courses).each(function(i, course) {
@@ -245,6 +269,7 @@
 
 									updateTotalStrokes();
 									updateTotalPoints();
+									updateNewHandicap();
 								})
 
 							$("#scorecard-table #points-row")
