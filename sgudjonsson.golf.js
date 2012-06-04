@@ -94,6 +94,11 @@ sgudjonsson.golf = (function() {
 			}
 
 			return fixFloat(playerCurrentHandicap);
+		},
+
+		_getPlayingHandicap: function(playerExactHandicap, courseSlopeRating, courseRating, coursePar) {
+			// Playing Handicap = Exact Handicap x (Slope Rating / 113) + (Course Rating - Par)
+			return Math.round(playerExactHandicap * (courseSlopeRating / 113) + (courseRating - coursePar));
 		}
 	};
 
@@ -109,6 +114,10 @@ sgudjonsson.golf = (function() {
 
 		getNewHandicap: function(playerCurrentHandicap, stablefordPoints, is18) {
 			return _methods._getNewHandicap(playerCurrentHandicap, stablefordPoints, is18);
+		},
+
+		getPlayingHandicap: function(playerExactHandicap, courseSlopeRating, courseRating, coursePar) {
+			return _methods._getPlayingHandicap(playerExactHandicap, courseSlopeRating, courseRating, coursePar);
 		}
 
 	}
