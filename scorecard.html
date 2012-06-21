@@ -55,11 +55,11 @@
 				<option value="">- Select a course -</option>
 			</select>
 			<label for="course-handicap">Course Hdcp</label>
-			<input id="course-handicap" value="36" maxlength="2" size="2" />
+			<input id="course-handicap" value="36" maxlength="" size="2" />
 			<label for="exact-handicap">Exact handicap</label>
-			<input id="exact-handicap" value="36" maxlength="2" size="2" />
+			<input id="exact-handicap" value="36" maxlength="" size="2" />
 			<label for="new-exact-handicap">New Exact handicap</label>
-			<input id="new-exact-handicap" value="36" maxlength="2" size="2" />
+			<input id="new-exact-handicap" value="36" maxlength="" size="2" />
 			<button id="show-scorecard">Show scorecard</button>
 		</div>
 		<div id="scorecard">
@@ -145,6 +145,54 @@
 						{ nr: 17, par: 4, hdcp: 15 },
 						{ nr: 18, par: 4, hdcp:  9 },
 					]
+				},
+				{
+					id: "GO",
+					title: "GO Urriðavöllur",
+					holes: [
+						{ nr:  1, par: 4, hdcp:  9 },
+						{ nr:  2, par: 4, hdcp: 17 },
+						{ nr:  3, par: 4, hdcp:  1 },
+						{ nr:  4, par: 3, hdcp: 15 },
+						{ nr:  5, par: 5, hdcp: 13 },
+						{ nr:  6, par: 4, hdcp:  3 },
+						{ nr:  7, par: 4, hdcp:  7 },
+						{ nr:  8, par: 3, hdcp: 11 },
+						{ nr:  9, par: 4, hdcp:  5 },
+						{ nr: 10, par: 4, hdcp:  6 },
+						{ nr: 11, par: 4, hdcp:  4 },
+						{ nr: 12, par: 5, hdcp: 14 },
+						{ nr: 13, par: 3, hdcp: 16 },
+						{ nr: 14, par: 5, hdcp: 10 },
+						{ nr: 15, par: 3, hdcp: 18 },
+						{ nr: 16, par: 4, hdcp: 12 },
+						{ nr: 17, par: 4, hdcp:  8 },
+						{ nr: 18, par: 4, hdcp:  2 },
+					]
+				},
+				{
+					id: "GRKORPA",
+					title: "GR Korpa",
+					holes: [
+						{ nr:  1, par: 5, hdcp:  6 },
+						{ nr:  2, par: 5, hdcp: 10 },
+						{ nr:  3, par: 3, hdcp:  2 },
+						{ nr:  4, par: 4, hdcp:  4 },
+						{ nr:  5, par: 4, hdcp:  8 },
+						{ nr:  6, par: 3, hdcp: 18 },
+						{ nr:  7, par: 5, hdcp: 14 },
+						{ nr:  8, par: 4, hdcp: 12 },
+						{ nr:  9, par: 3, hdcp: 16 },
+						{ nr: 10, par: 4, hdcp:  9 },
+						{ nr: 11, par: 5, hdcp: 11 },
+						{ nr: 12, par: 4, hdcp:  5 },
+						{ nr: 13, par: 3, hdcp:  7 },
+						{ nr: 14, par: 4, hdcp: 15 },
+						{ nr: 15, par: 5, hdcp:  1 },
+						{ nr: 16, par: 3, hdcp: 17 },
+						{ nr: 17, par: 4, hdcp:  3 },
+						{ nr: 18, par: 4, hdcp: 13 },
+					]
 				}
 			];
 
@@ -182,9 +230,9 @@
 
 				var hdcp = $("#exact-handicap").val();
 				if(count == 9)
-					hdcp = sgudjonsson.golf.getNewHandicap(parseInt(hdcp), sum, false);
+					hdcp = sgudjonsson.golf.getNewHandicap(parseFloat(hdcp), sum, false);
 				else if(count == 18)
-					hdcp = sgudjonsson.golf.getNewHandicap(parseInt(hdcp), sum, true);
+					hdcp = sgudjonsson.golf.getNewHandicap(parseFloat(hdcp), sum, true);
 
 				if(count == 9 || count == 18)
 					$("#new-exact-handicap").val(hdcp);
@@ -212,7 +260,7 @@
 							}
 						}
 
-						var courseHdcp = parseInt($("#course-handicap").val());
+						var courseHdcp = parseFloat($("#course-handicap").val());
 
 						$("#scorecard")
 							.empty()
@@ -250,8 +298,8 @@
 								.data(course.holes[i])
 								.blur(function() {
 									var d = $(this).data(),
-										s = parseInt($(this).val()),
-										h = parseInt($("#course-handicap").val()),
+										s = parseFloat($(this).val()),
+										h = parseFloat($("#course-handicap").val()),
 										a = sgudjonsson.golf.getAdjustedPar(h, d.hdcp, d.par),
 										p = sgudjonsson.golf.getStablefordPoints(a, s);
 
